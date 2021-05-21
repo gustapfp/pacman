@@ -14,17 +14,24 @@ RED_204 = (204,37,18)
 BLACK = (0,0,0)
 
 
-x=0
+spd_x = 0.1
+
+x_pos = 0
 while True:
-    # Regras  
+    # RUles  
     
     # grafics
     window.fill(BLACK)
-    pygame.draw.circle(window, RED_204, (500 + x, 400), 10, 0)
+
+    x_pos += spd_x
+    pygame.draw.circle(window, RED_204, (int(x_pos), 400), 10, 0)
     pygame.display.update()
 
     # events
-    x += 1
+    if x_pos > window_x_size: # 10 is the circle radius x2 value
+        spd_x = -0.1
+    elif x_pos < 0:
+        spd_x = 0.1
 
     for e in pygame.event.get():
         if e.type == pygame.QUIT: # check if the user have clicked on the X box to quit
