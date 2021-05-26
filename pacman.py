@@ -10,6 +10,7 @@ window = pygame.display.set_mode((window_x_size, window_y_size), 0, 0)
 YELLOW = (255,255,0)
 BLACK = (0,0,0)
 BLUE = (13,56,143)
+WHITE = (255, 255, 255)
 
 class Scenery:
     def __init__(self, size):
@@ -52,9 +53,12 @@ class Scenery:
         for column_index, column in enumerate(line):
             x_box = column_index * self.size
             y_box = line_index * self.size
+            half_size = self.size //2
 
             if column == 2:
                 pygame.draw.rect(surface, BLUE, (x_box, y_box, self.size, self.size), 0)
+            elif column == 1:
+                pygame.draw.circle(surface, YELLOW, (x_box + half_size, y_box + half_size), self.size//10, 0)
             else:
                 pygame.draw.rect(surface, BLACK, (x_box, y_box, self.size, self.size), 0)
 
