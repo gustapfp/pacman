@@ -3,24 +3,77 @@ import pygame
 pygame.init()
 
 window_x_size = 800
-window_y_size = 600
+window_y_size = 800
 window = pygame.display.set_mode((window_x_size, window_y_size), 0, 0)
 
-
-
-# Color used in the pacman draw
+# Color used in the game
 YELLOW = (255,255,0)
 BLACK = (0,0,0)
+BLUE = (13,56,143)
+
+class Scenery:
+    def __init__(self, size):
+        self.size = size // 30
+
+        self.matrix = [ 
+            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 2],
+            [2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2],
+            [2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2],
+            [2, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 0, 0, 0, 0, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0, 2, 1, 2, 2, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2],
+            [2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2],
+            [2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2],
+            [2, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+        ]
+
+
+    def paint_line(self, surface, line_index, line):
+        for column_index, column in enumerate(line):
+            x_box = column_index * self.size
+            y_box = line_index * self.size
+
+            if column == 2:
+                pygame.draw.rect(surface, BLUE, (x_box, y_box, self.size, self.size), 0)
+            else:
+                pygame.draw.rect(surface, BLACK, (x_box, y_box, self.size, self.size), 0)
+
+    def paint_scenery(self, surface): # , matrixcolumn, matrix_liner
+        for line_index, line in enumerate(self.matrix):
+            self.paint_line(surface, line_index, line)
+        
 
 
 class Pacman:
     def __init__(self):
-        self.x_center = int((window_x_size/2))
-        self.y_center = int((window_y_size/2))
-        self.size = 100 # 2x radius
-        self.radius = int((self.size/2))
-        self.speed_x = 0.1
-        self.speed_y = 0.1
+        self.line = 1
+        self.column = 1
+        self.size = int(window_x_size//30) # 2x radius and size/number of the cells
+        self.radius = int((self.size//2))
+        self.x_center = int((window_x_size//2))
+        self.y_center = int((window_y_size//2))
+        self.speed_x = 0
+        self.speed_y = 0
     
     def draw_pacman(self, surface):
         # Draw pacman's character
@@ -39,33 +92,27 @@ class Pacman:
         return pacman_body, pacman_eye, pacman_mouth
     
     def calculate_rules(self):
-        self.x_center += self.speed_x
-        self.y_center -= self.speed_y
+        self.column += self.speed_x
+        self.line += self.speed_y
+        self.x_center = int( (self.column * self.size) + self.radius ) 
+        self.y_center = int( (self.line * self.size) + self.radius )
+
+       
         
-        pacman_touch_right_side = self.x_center > (window_x_size - self.radius)
-        pacman_touch_left_side = self.x_center < 0 + self.radius
-        pacman_touch_upside = self.y_center > (window_y_size - self.radius)
-        pacman_touch_botton_side = self.y_center < 0 + self.radius
-
-
-        if pacman_touch_right_side: # if the right part of the ball toches the right side of the surface turnaround
-            self.speed_x = -self.speed_x           
-        elif pacman_touch_left_side: # if the left part of the ball toches the left sideof the surface turnaround
-            self.speed_x = -self.speed_x # -1 * -1 = +1  
-        elif pacman_touch_upside: # if the top of the ball toches the upside of the surface turnaround
-            self.speed_y = -self.speed_y
-        elif pacman_touch_botton_side: # if the bottom the ball toches the lowest point the surface turnaround
-            self.speed_y = -self.speed_y
-
+    
 if __name__ == '__main__':
     pacman = Pacman()
-    # speed_x = 0.1
-    # speed_y = 0.1
+    scenary = Scenery(window_x_size)
+
+
+   
 
     while True:
 
         # Game Rules
         pacman.calculate_rules()
+
+        scenary.paint_scenery(window)
 
         
         # Figures
@@ -73,8 +120,23 @@ if __name__ == '__main__':
         pacman.draw_pacman(window)
         pygame.display.update()
         window.fill(BLACK)
+        pygame.time.delay(100)
 
-
-        for e in pygame.event.get():
+        eventos = pygame.event.get()
+        for e in eventos:
             if e.type == pygame.QUIT: # check if the user have clicked on the X box to quit
                 exit()
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_RIGHT or e.key == pygame.K_d:
+                    pacman.speed_x = 1
+                elif e.key == pygame.K_LEFT or e.key == pygame.K_a:
+                    pacman.speed_x = -1
+                elif e.key == pygame.K_UP or e.key == pygame.K_w:
+                    pacman.speed_y = -1
+                elif e.key == pygame.K_DOWN or e.key == pygame.K_s:
+                    pacman.speed_y = 1
+            elif e.type == pygame.KEYUP:
+                pacman.speed_x = 0
+                pacman.speed_y = 0
+            
+
