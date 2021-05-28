@@ -10,11 +10,13 @@ BLACK = (0,0,0)
 BLUE = (13,56,143)
 speed = 1
 
+
+
 class Scenery:
     def __init__(self, size, character):
         self.character = character
         self.size = size 
-        self.point = 0
+        self.points = 0
         self.matrix = [
             [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
@@ -60,11 +62,19 @@ class Scenery:
             if column == 1:
                 pygame.draw.circle(surface, YELLOW, (x_box + half_size, y_box + half_size), self.size//10, 0)
                 
-           
+    def draw_points(self, surface):
+        score_board_x = 30 * self.size # give us a a x ponint far from the maze
+        text = f'Score {self.points}'
+        score_board_font = pygame.font.SysFont('Arial', 22)
+        score_board_text = score_board_font.render(text, True, YELLOW, None)
+        window.blit(score_board_text, (score_board_x, 50))
 
     def paint_scenery(self, surface):
         for line_index, line in enumerate(self.matrix):
             self.paint_line(surface, line_index, line)
+        self.draw_points(window)
+
+
 
     def calculate_rules(self):
         column_character = self.character.intention_column
@@ -74,9 +84,9 @@ class Scenery:
             if self.matrix[line_character][column_character] != 2:
                 self.character.aprove_movement()
                 if self.matrix[line_character][column_character] == 1:
-                    self.point += 1
+                    self.points += 1
                     self.matrix[line_character][column_character] = 0
-                    print(self.point)
+                    
         
 
 
@@ -118,6 +128,7 @@ class Pacman:
         pacman_body 
         pacman_eye
         pacman_mouth
+
     
     def calculate_events(self, events):
         for e in events:
@@ -168,7 +179,7 @@ if __name__ == '__main__':
         pacman.draw_pacman(window)
         pygame.display.update()
         pygame.time.delay(100)
-
+        
         
         events = pygame.event.get()
         pacman.calculate_events(events)
