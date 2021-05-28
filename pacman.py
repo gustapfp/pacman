@@ -2,21 +2,20 @@ import pygame
 
 pygame.init()
 
-window_x_size = 800
-window_y_size = 800
-window = pygame.display.set_mode((window_x_size, window_y_size), 0, 0)
+window = pygame.display.set_mode((800, 600), 0)
 
 # Color used in the game
 YELLOW = (255,255,0)
 BLACK = (0,0,0)
 BLUE = (13,56,143)
-WHITE = (255, 255, 255)
+speed = 1
 
 class Scenery:
-    def __init__(self, size):
-        self.size = size // 30
-
-        self.matrix = [ 
+    def __init__(self, size, character):
+        self.character = character
+        self.size = size 
+        self.point = 0
+        self.matrix = [
             [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2],
@@ -53,94 +52,126 @@ class Scenery:
         for column_index, column in enumerate(line):
             x_box = column_index * self.size
             y_box = line_index * self.size
-            half_size = self.size //2
-
+            half_size = self.size // 2
+            color = BLACK
             if column == 2:
-                pygame.draw.rect(surface, BLUE, (x_box, y_box, self.size, self.size), 0)
-            elif column == 1:
+                color = BLUE
+            pygame.draw.rect(surface, color, (x_box, y_box, self.size, self.size), 0)
+            if column == 1:
                 pygame.draw.circle(surface, YELLOW, (x_box + half_size, y_box + half_size), self.size//10, 0)
-            else:
-                pygame.draw.rect(surface, BLACK, (x_box, y_box, self.size, self.size), 0)
+                
+           
 
-    def paint_scenery(self, surface): # , matrixcolumn, matrix_liner
+    def paint_scenery(self, surface):
         for line_index, line in enumerate(self.matrix):
             self.paint_line(surface, line_index, line)
+
+    def calculate_rules(self):
+        column_character = self.character.intention_column
+        line_character = self.character.intention_line
+
+        if 0 <= column_character < 28 and 0 <= line_character < 29: 
+            if self.matrix[line_character][column_character] != 2:
+                self.character.aprove_movement()
+                if self.matrix[line_character][column_character] == 1:
+                    self.point += 1
+                    self.matrix[line_character][column_character] = 0
+                    print(self.point)
         
 
 
 class Pacman:
-    def __init__(self):
-        self.line = 1
+    def __init__(self, size):
         self.column = 1
-        self.size = int(window_x_size//30) # 2x radius and size/number of the cells
-        self.radius = int((self.size//2))
-        self.x_center = int((window_x_size//2))
-        self.y_center = int((window_y_size//2))
+        self.line = 1
+        self.x_center = 400
+        self.y_center = 300
+        self.size = size # 2x radius and size/number of the cells
         self.speed_x = 0
         self.speed_y = 0
-    
+        self.radius = self.size // 2
+        self.intention_column = self.column
+        self.intention_line = self.line
+
+    def calculate_rules(self):
+        # calculate the movimentantion
+        self.intention_column =  self.column + self.speed_x
+        self.intention_line = self.line + self.speed_y
+        
+
     def draw_pacman(self, surface):
         # Draw pacman's character
+        pacman_body = pygame.draw.circle(surface, YELLOW, (self.x_center, self.y_center), self.radius, 0)
+        
         
         # Coordinates
-        x_eye_position = (self.x_center + int(self.radius/4))
+        x_eye_position = ( self.x_center + int( self.radius/4 ) )
         y_eye_position = ( self.y_center - int( (self.radius/2) ) )
         point_a = (self.x_center, self.y_center) # Center
         point_b = ((self.x_center + self.radius), self.y_center) # Right Center
         point_c = ((self.x_center + self.radius), (self.y_center - self.radius)) # Superior Right Center
-
+        points = [point_a, point_b, point_c]
         # Pacman 
-        pacman_body = pygame.draw.circle(surface, YELLOW, (self.x_center, self.y_center), self.radius, 0)
         pacman_eye = pygame.draw.circle(surface, BLACK, (x_eye_position, y_eye_position), int(self.radius/10), 0)
-        pacman_mouth = pygame.draw.polygon(surface, BLACK, [point_a, point_b, point_c], 0)
-        return pacman_body, pacman_eye, pacman_mouth
+        pacman_mouth = pygame.draw.polygon(surface, BLACK, points, 0)
+        # Make the draws
+        pacman_body 
+        pacman_eye
+        pacman_mouth
     
-    def calculate_rules(self):
-        self.column += self.speed_x
-        self.line += self.speed_y
-        self.x_center = int( (self.column * self.size) + self.radius ) 
-        self.y_center = int( (self.line * self.size) + self.radius )
+    def calculate_events(self, events):
+        for e in events:
+            if e.type == pygame.QUIT: # check if the user have clicked on the X box to quit
+                exit()
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_RIGHT or e.key == pygame.K_d:
+                    self.speed_x = speed
+                elif e.key == pygame.K_LEFT or e.key == pygame.K_a:
+                    self.speed_x = -speed
+                elif e.key == pygame.K_UP or e.key == pygame.K_w:
+                    self.speed_y = -speed
+                elif e.key == pygame.K_DOWN or e.key == pygame.K_s:
+                    self.speed_y = speed
+            elif e.type == pygame.KEYUP:
+                if e.key == pygame.K_RIGHT or e.key == pygame.K_d:
+                    self.speed_x = 0
+                elif e.key == pygame.K_LEFT or e.key == pygame.K_a:
+                    self.speed_x = 0
+                elif e.key == pygame.K_UP or e.key == pygame.K_w:
+                    self.speed_y = 0
+                elif e.key == pygame.K_DOWN or e.key == pygame.K_s:
+                    self.speed_y = 0
 
+    def aprove_movement(self):
+        self.column = self.intention_column
+        self.line = self.intention_line
+        self.x_center = int( self.column * self.size + self.radius ) 
+        self.y_center = int( self.line * self.size + self.radius )
        
-        
     
 if __name__ == '__main__':
-    pacman = Pacman()
-    scenary = Scenery(window_x_size)
-
-
-   
+    size = 600 // 30
+    pacman = Pacman(size)
+    scenary = Scenery(size, pacman)  
+    
 
     while True:
 
         # Game Rules
         pacman.calculate_rules()
-
-        scenary.paint_scenery(window)
+        scenary.calculate_rules()
 
         
         # Figures
-
+        window.fill(BLACK)
+        scenary.paint_scenery(window)
         pacman.draw_pacman(window)
         pygame.display.update()
-        window.fill(BLACK)
         pygame.time.delay(100)
 
-        eventos = pygame.event.get()
-        for e in eventos:
-            if e.type == pygame.QUIT: # check if the user have clicked on the X box to quit
-                exit()
-            elif e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_RIGHT or e.key == pygame.K_d:
-                    pacman.speed_x = 1
-                elif e.key == pygame.K_LEFT or e.key == pygame.K_a:
-                    pacman.speed_x = -1
-                elif e.key == pygame.K_UP or e.key == pygame.K_w:
-                    pacman.speed_y = -1
-                elif e.key == pygame.K_DOWN or e.key == pygame.K_s:
-                    pacman.speed_y = 1
-            elif e.type == pygame.KEYUP:
-                pacman.speed_x = 0
-                pacman.speed_y = 0
+        
+        events = pygame.event.get()
+        pacman.calculate_events(events)
+        
             
 
