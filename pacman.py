@@ -1,4 +1,5 @@
 import pygame
+from abc import ABCMeta, abstractmethod
 
 pygame.init()
 
@@ -10,9 +11,21 @@ BLACK = (0,0,0)
 BLUE = (13,56,143)
 speed = 1
 
+class GamesElements(metaclass = ABCMeta):
+    
+
+    @abstractmethod
+    def calculate_rules(self):
+        pass
+    @abstractmethod
+    def draw(self):
+        pass
+    @abstractmethod
+    def calculate_events(self, events):
+        pass
 
 
-class Scenery:
+class Scenery(GamesElements):
     def __init__(self, size, character):
         self.character = character
         self.size = size 
@@ -62,7 +75,7 @@ class Scenery:
             if column == 1:
                 pygame.draw.circle(surface, YELLOW, (x_box + half_size, y_box + half_size), self.size//10, 0)
                 
-    def draw_points(self, surface):
+    def draw(self, surface):
         score_board_x = 30 * self.size # give us a a x ponint far from the maze
         text = f'Score {self.points}'
         score_board_font = pygame.font.SysFont('Arial', 22)
@@ -72,7 +85,7 @@ class Scenery:
     def paint_scenery(self, surface):
         for line_index, line in enumerate(self.matrix):
             self.paint_line(surface, line_index, line)
-        self.draw_points(window)
+        self.draw(window)
 
 
 
@@ -86,7 +99,10 @@ class Scenery:
                 if self.matrix[line_character][column_character] == 1:
                     self.points += 1
                     self.matrix[line_character][column_character] = 0
-                    
+    def calculate_events(self, events):
+        for e in events:
+            if e.type == pygame.QUIT: # check if the user have clicked on the X box to quit
+                exit()
         
 
 
@@ -109,7 +125,7 @@ class Pacman:
         self.intention_line = self.line + self.speed_y
         
 
-    def draw_pacman(self, surface):
+    def draw(self, surface):
         # Draw pacman's character
         pacman_body = pygame.draw.circle(surface, YELLOW, (self.x_center, self.y_center), self.radius, 0)
         
@@ -132,9 +148,7 @@ class Pacman:
     
     def calculate_events(self, events):
         for e in events:
-            if e.type == pygame.QUIT: # check if the user have clicked on the X box to quit
-                exit()
-            elif e.type == pygame.KEYDOWN:
+            if e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_RIGHT or e.key == pygame.K_d:
                     self.speed_x = speed
                 elif e.key == pygame.K_LEFT or e.key == pygame.K_a:
@@ -176,13 +190,14 @@ if __name__ == '__main__':
         # Figures
         window.fill(BLACK)
         scenary.paint_scenery(window)
-        pacman.draw_pacman(window)
+        pacman.draw(window)
         pygame.display.update()
         pygame.time.delay(100)
         
         
-        events = pygame.event.get()
-        pacman.calculate_events(events)
+        event = pygame.event.get()
+        pacman.calculate_events(event)
+        scenary.calculate_events(event)
         
             
 

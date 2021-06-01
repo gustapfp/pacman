@@ -133,3 +133,5 @@ dmypy.json
 # my files
 
 pacman0.py
+house.py
+main.py
