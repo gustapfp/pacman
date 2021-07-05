@@ -9,6 +9,7 @@ window = pygame.display.set_mode((800, 600), 0)
 YELLOW = (255,255,0)
 BLACK = (0,0,0)
 BLUE = (13,56,143)
+RED = (255, 0, 0)
 speed = 1
 
 class GamesElements(metaclass = ABCMeta):
@@ -106,7 +107,7 @@ class Scenery(GamesElements):
         
 
 
-class Pacman:
+class Pacman(GamesElements):
     def __init__(self, size):
         self.column = 1
         self.line = 1
@@ -172,8 +173,23 @@ class Pacman:
         self.line = self.intention_line
         self.x_center = int( self.column * self.size + self.radius ) 
         self.y_center = int( self.line * self.size + self.radius )
-       
-    
+class Ghosts(GamesElements):
+    def __init__(self, color):
+        self.column = 7
+        self.line = 8
+        self.color = color
+    def draw(self):
+        ghost
+        
+
+
+
+
+    def calculate_events(self, events):
+        pass
+    def calculate_rules(self):
+        pass
+
 if __name__ == '__main__':
     size = 600 // 30
     pacman = Pacman(size)
